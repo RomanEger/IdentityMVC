@@ -1,0 +1,26 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+    <title>Login</title>
+</head>
+<body>
+<div>
+    <form method="post">
+        <label asp-for="login">Логин</label>
+        <input type="text" asp-for="login" name="login"/>
+        <span asp-validation-for="login"/>
+        
+        <label asp-for="password">Пароль</label>
+        <input type="password" asp-for="password" name="Password"/>
+        <span asp-validation-for="password"/>
+        
+        <input type="submit" value="Войти"/>
+    </form>
+</div>
+</body>
+</html>
