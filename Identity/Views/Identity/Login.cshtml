@@ -1,26 +1,24 @@
 ﻿@{
-    Layout = null;
+    ViewData["Title"] = "Вход";
 }
 
-<!DOCTYPE html>
+<h1 class="text-center mb-4">@ViewData["Title"]</h1>
+<form method="post" class="text-center">
+    <div class="mb-3">
+        <label>Логин</label><br/>
+        <input class="form-control" type="text" asp-for="login" name="login"/>
+        <div>
+            <span asp-validation-for="login" class="text-danger"></span>
+        </div>
+    </div>
 
-<html lang="ru">
-<head>
-    <title>Login</title>
-</head>
-<body>
-<div>
-    <form method="post">
-        <label asp-for="login">Логин</label>
-        <input type="text" asp-for="login" name="login"/>
-        <span asp-validation-for="login"/>
-        
-        <label asp-for="password">Пароль</label>
-        <input type="password" asp-for="password" name="Password"/>
-        <span asp-validation-for="password"/>
-        
-        <input type="submit" value="Войти"/>
-    </form>
-</div>
-</body>
-</html>
+    <div class="mb-4">
+        <label>Пароль</label><br/>
+        <input class="form-control w-100" type="password" asp-for="password" name="Password"/>
+        <div>
+            <span asp-validation-for="password" class="text-danger"></span>
+        </div>
+    </div>
+
+    <input type="submit" class="btn btn-primary" value="Войти"/>
+</form>

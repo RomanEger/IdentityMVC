@@ -30,22 +30,25 @@ public class IdentityController : Controller
             
             var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
 
-            var context = ControllerContext.HttpContext;
+            var context = HttpContext;
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
             
-            await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+            await context.SignInAsync(claimsPrincipal);
             
-            return RedirectPermanent($"~/");
+            var user = context.User.Identity;
+            var b = user.IsAuthenticated;
+            return RedirectPermanent($"/");
         }
         
-        return Redirect("/login");
+        return RedirectPermanent("/login");
     }
 
+    [HttpPost]
     public async Task<IActionResult> Logout()
     {
-        
-        var context = ControllerContext.HttpContext;
+        var context = HttpContext;
         await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return Redirect("/login");
+        return RedirectPermanent("/login");
     }
     
     [HttpGet]
@@ -63,14 +66,14 @@ public class IdentityController : Controller
                 
             var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
 
-            var context = ControllerContext.HttpContext;
+            var context = HttpContext;
             
             await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
                 
-            return RedirectPermanent($"~/");
+            return RedirectPermanent($"/");
         }
         
 
-        return Redirect("/registration");
+        return RedirectPermanent("/registration");
     }
 }

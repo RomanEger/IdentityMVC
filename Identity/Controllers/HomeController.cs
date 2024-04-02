@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Identity.Controllers;
 
 [Route("")]
 public class HomeController : Controller
 {
-    
-    [Authorize]
     public IActionResult Index()
     {
+        var user = HttpContext.User.Identity;
+        if (user is null || !user.IsAuthenticated)
+            return RedirectPermanent("/login");
         return View();
     }
 }
