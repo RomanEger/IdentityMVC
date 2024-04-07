@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
 using Identity.Models;
+using Identity.Models.Entities;
+using Identity.Repository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -9,14 +11,12 @@ namespace Identity.Controllers;
 [Route("{action}")]
 public class IdentityController : Controller
 {
-    private List<Person> _persons = new List<Person>()
+    private IRepository<User> _repository;
+    
+    public IdentityController(IRepository<User> repository)
     {
-        new Person()
-        {
-            Login = "test",
-            Password = "1234"
-        }
-    };
+        _repository = repository;
+    }
     
     [HttpGet]
     public IActionResult Login() => View();
@@ -24,18 +24,18 @@ public class IdentityController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(Person person)
     {
-        if (_persons.Any(p => p.Login == person.Login && p.Password == person.Password))
+        var p = await _repository.Get(x => x.Login == person.Login && x.Password == person.Password);
+        if (p is not null)
         {
             var claims = new List<Claim> { new Claim(ClaimTypes.Name, person.Login) };
             
             var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
 
-            var context = HttpContext;
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
             
-            await context.SignInAsync(claimsPrincipal);
+            await HttpContext.SignInAsync(claimsPrincipal);
             
-            var user = context.User.Identity;
+            var user = HttpContext.User.Identity;
             var b = user.IsAuthenticated;
             return RedirectPermanent($"/");
         }
@@ -58,17 +58,21 @@ public class IdentityController : Controller
     [HttpPost]
     public async Task<IActionResult> Registration(Person person)
     {
-        if (ModelState.IsValid && _persons.All(p => p.Login != person.Login))
+        var p = await _repository.Get(p => p.Login == person.Login);
+        if (ModelState.IsValid && p is null)
         {
-            _persons.Add(person);
+            var user = new User()
+            {
+                Login = person.Login,
+                Password = person.Password
+            };
+            await _repository.Add(user);
                 
             var claims = new List<Claim> { new Claim(ClaimTypes.Name, person.Login) };
                 
             var claimsIdentity = new ClaimsIdentity(claims, "Cookies");
-
-            var context = HttpContext;
             
-            await context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
                 
             return RedirectPermanent($"/");
         }
