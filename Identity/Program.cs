@@ -12,7 +12,7 @@ builder.Services.AddScoped<IRepository<User>, UserRepository>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
 
-builder.Services.AddMvc();
+builder.Services.AddMvc().AddRazorRuntimeCompilation();
 
 var app = builder.Build();
 
